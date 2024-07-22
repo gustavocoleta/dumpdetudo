@@ -1,0 +1,23 @@
+services:
+  dumpdetudo:
+    container_name: dumpdetudo
+    build:
+      context: ./.docker
+      dockerfile: Dockerfile
+    command: postgres -c log_statement=all -c wal_level=logical -p 54323
+    volumes:
+      - '.data:/var/lib/postgresql/data'
+      - '.backup:/tmp/backup'
+      - '.script/restore:/usr/bin/restore'
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '54323:54323'
+    networks:
+      - vrmasterapi-net
+
+networks:
+  vrmasterapi-net:
+    name: vrmasterapi-net
+    external: true
