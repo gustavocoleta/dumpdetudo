@@ -10,15 +10,15 @@ docker-compose up
 
 ⚠️ Ao executar os comandos de restore, **TODOS** os bancos de dados serão apagado e substituídos pelo dump.
 
-ℹ️ Caso não queira perder os dados já restaurados, renomeie a pasta `.data` para  qualquer nome que inicie com `.data`, exemplo `.data.bkp` antes de executar o comando de restore.
+ℹ️ Caso não queira perder os dados já restaurados, renomeie a pasta `.data` para  qualquer nome que inicie com `.data`, exemplo `.data.bkp` antes de executar o comando de restore. Para retornar os dados, basta renomear a pasta para `.data`, apagando a já existente.
 
 - ### Restaurar o dump padrão
 
     Adicione o arquivo `dumpdetudo.sql` na pasta `.backup` e execute o comando abaixo.
 
-        ```bash
-        docker exec dumpdetudo restore
-        ```
+    ```bash
+    docker exec dumpdetudo restore
+    ```
 
 - ### Restaurar um dump específico
 
