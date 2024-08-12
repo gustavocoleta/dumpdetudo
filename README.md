@@ -41,7 +41,7 @@ Para utilização do dump nas API's, é necessário alterar os environments de b
     DB_DATABASE='rede'
     DB_PORT=54323
     ```
-- VRMasterAPIRede
+- VRMasterAPIUsuario
     ```env
     #POSTGRES
     DB_HOST='dumpdetudo'
