@@ -14,23 +14,27 @@ docker-compose up
 
 - ### Restaurar o dump padrão
 
-    Adicione o arquivo `dumpdetudo.sql` na pasta `.backup` e execute o comando abaixo.
+    Adicione o arquivo `dumpdetudo.sql` na pasta `.backup`, na raiz do repositório, e execute o comando abaixo.
 
     ```bash
     docker exec dumpdetudo restore
     ```
 
+    Se ao final, exibir a mensagem **`Done!`**, o dump foi restaurado com sucesso.
+
 - ### Restaurar um dump específico
 
-    Caso o arquivo tenha outro nome, adicione-o na pasta `.backup` execute o comando:
+    Caso o arquivo tenha outro nome, adicione-o na pasta `.backup`, na raiz do repositório, execute o comando:
 
     ```bash
     docker exec dumpdetudo restore [NAME_OF_THE_BACKUP_FILE.sql]
     ```
 
+    Se ao final, exibir a mensagem **`Done!`**, o dump foi restaurado com sucesso.
+
 ## Configuração nas API's
 
-Para utilização do dump nas API's, é necessário alterar os environments de banco de dados, no arquivo `.env.development` de cada API, com os valores abaixo, e reiniciar os containers.
+Para utilização do dump é necessário alterar os environments de banco de dados, no arquivo `.env.development` das API's listadas abaixo, com os respectivos valores, e reiniciar os containers. As demais API's não necessitam de alteração, pois irão utilizar o banco de dados cadastrado nas Redes, e esses valores já estão configurados.
 
 - VRMasterAPIRede
     ```env

@@ -1,5 +1,13 @@
 #!/bin/bash
 
+message(){
+    if [[ $2 == "ok" ]]; then
+        echo -e "- \e[1A\e[K$1 [✔️]"
+    else
+        echo -e "- $1..."
+    fi
+}
+
 BACKUP_FILE=/tmp/backup/dumpdetudo.sql
 
  # Check if backup file exists as /tmp/backup/dumpdetudo.sql
@@ -16,55 +24,78 @@ if [ ! -f $BACKUP_FILE ]; then
     fi
 fi
 
+echo "Starting the restore process..."
 
 # List & Delete all databases
-echo "Listing all databases"
+message "Listing databases to delete"
 
 psql -U postgres -p 54323 -q -t -c "SELECT 'DROP DATABASE \"' || datname || '\";' FROM pg_database WHERE datname <> ALL ('{template0,template1,postgres}')" > /tmp/drop-all-databases.sql
 
-echo "Listing all databases [✔️]"
+message "Listing databases to delete" "ok"
 
 if [ -s /tmp/drop-all-databases.sql ]; then
-    echo "Deleting all databases"
+    message "Deleting all databases"
 
     psql -U postgres -p 54323 -q -f /tmp/drop-all-databases.sql
 
-    echo "Deleting all databases [✔️]"
+    message "Deleting all databases" "ok"
 fi
 
 # List & Delete all roles
-echo "Listing all roles"
+message "Listing all roles"
 psql -U postgres -p 54323 -q -t -c "SELECT 'DROP ROLE \"' || rolname || '\";' FROM pg_roles WHERE rolname NOT LIKE 'pg%' AND rolname <> 'postgres';" > /tmp/drop-all-roles.sql
-echo "Listing all roles [✔️]"
+message "Listing all roles" "ok"
 
 if [ -s /tmp/drop-all-roles.sql ]; then
-    echo "Deleting all roles"
+    message "Deleting all roles"
 
     psql -U postgres -p 54323 -q -f /tmp/drop-all-roles.sql
 
-    echo "Deleting all roles [✔️]"
+    message "Deleting all roles" "ok"
 fi
 
 # Restore the backup
-echo "Restoring the backup"
+message "Restoring the backup"
 
-psql -U postgres -p 54323 -P pager=off -f $BACKUP_FILE > /dev/null
+psql -U postgres -p 54323 -f $BACKUP_FILE &> /dev/null
 
-echo "Restoring the backup [✔️]"
+message "Restoring the backup" "ok"
 
 # Set the password for the postgres user
-echo "Setting the password for the postgres user"
+message "Setting the password for the postgres user"
 
 psql -U postgres -p 54323 -q -c "ALTER USER postgres WITH PASSWORD 'postgres';"
 
-echo "Setting the password for the postgres user [✔️]"
+message "Setting the password for the postgres user" "ok"
 
 # Set the hostPort for the 'dumpdetudo:54323' from the 'rede' database, in the 'redeservico' table
-echo "Setting the hostPort for the 'dumpdetudo:54323' from the 'rede' database, in the 'redeservico' table"
+message "Setting the hostPort for the 'dumpdetudo:54323' from the 'rede' database, in the 'redeservico' table"
 
 psql -U postgres -p 54323 -d rede -q -c "delete from redeservico;"
 psql -U postgres -p 54323 -d rede -q -c "insert into redeservico (\"hostPort\", servico, \"idRede\") select 'dumpdetudo:54323', '0', id from rede order by id;"
 
-echo "Setting the hostPort for the 'dumpdetudo:54323' from the 'rede' database, in the 'redeservico' table [✔️]"
+message "Setting the hostPort for the 'dumpdetudo:54323' from the 'rede' database, in the 'redeservico' table" "ok"
 
-echo "Done! [✔️]"
+# Truncate the tables configuracao, configuracaonsu and configuracaoemail from the databases that starts with 'monitorxml'
+message "Listing all databases"
+
+DATABASE_LIST=/tmp/database_list.txt
+
+psql -U postgres -p 54323 -q -t -c "SELECT datname FROM pg_database WHERE datname <> ALL ('{template0,template1,postgres}') ORDER BY datname" > $DATABASE_LIST
+
+message "Listing all databases" "ok"
+
+message "Truncate monitorxml configs"
+
+# Read the input file line by line
+while read -r LINE
+do
+    if [[ $LINE = monitorxml* ]]; then
+        # printf '%s\n' "$LINE"
+        psql -U postgres -p 54323 -d $LINE -q -t -c "TRUNCATE configuracaonsu, configuracaoemail, configuracaomanifestacao, configuracao CASCADE;"
+    fi
+done < "$DATABASE_LIST"
+
+message "Truncate monitorxml configs" "ok"
+
+echo "Done!"
