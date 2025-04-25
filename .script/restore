@@ -74,6 +74,9 @@ message "Setting the hostPort for the 'dumpdetudo:54323' from the 'rede' databas
 psql -U postgres -p 54323 -d rede -q -c "delete from redeservico;"
 psql -U postgres -p 54323 -d rede -q -c "insert into redeservico (\"hostPort\", servico, \"idRede\") select 'dumpdetudo:54323', '0', id from rede order by id;"
 
+# Add a configuração do MONGODB para o serviço 17 da APIVenddaRelatorio em todas as redes
+psql -U postgres -p 54323 -d rede -q -c "INSERT INTO redeservico (\"hostPort\", servico, \"idRede\", \"tipoBanco\") SELECT 'root:root@dumpdetudomongodb:28017' AS \"hostPort\",'17' AS servico,r.id AS \"idRede\",'mongodb' AS \"tipoBanco\" FROM public.rede r ORDER BY r.id;"
+
 message "Setting the hostPort for the 'dumpdetudo:54323' from the 'rede' database, in the 'redeservico' table" "ok"
 
 # Truncate the tables configuracao, configuracaonsu and configuracaoemail from the databases that starts with 'monitorxml'
