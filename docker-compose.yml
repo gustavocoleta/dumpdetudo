@@ -17,6 +17,21 @@ services:
     networks:
       - vrmasterapi-net
 
+  dumpdetudomongodb:
+    image: mongo:7.0.0
+    container_name: dumpdetudomongodb
+    command: mongod --port 28017
+    volumes:
+      - ".mongo:/data/db"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+      - TZ=America/Sao_Paulo
+    ports:
+      - "28017:28017"
+    networks:
+      - vrmasterapi-net
+
 networks:
   vrmasterapi-net:
     name: vrmasterapi-net
